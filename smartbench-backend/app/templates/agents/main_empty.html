@@ -1,0 +1,15 @@
+{% set title = 'Scientific Copilot' %}
+{% set subtitle = 'Select a conversation thread or start a new one from the context panel.' %}
+{% set breadcrumbs = [{'label': 'Agents', 'url': None}] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    Scientific Copilot is currently read-only for platform records and cannot mutate database data.
+  </div>
+  {% set title = 'No Active Conversation' %}
+  {% set message = 'Use the left context panel to open a thread. SmartBench agents can only operate via governed internal tools.' %}
+  {% set action_label = 'Start New Conversation' %}
+  {% set action_url = url_for('dashboard.new_agent_session') %}
+  {% include 'partials/empty_state.html' %}
+</div>

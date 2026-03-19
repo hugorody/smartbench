@@ -1,0 +1,43 @@
+{% set title = 'Create Notebook Entry' %}
+{% set subtitle = 'Template: ' ~ notebook_template.name %}
+{% set breadcrumbs = [
+  {'label': 'Create', 'url': url_for('dashboard.create_home')},
+  {'label': 'Notebook Entry', 'url': None}
+] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <form method="post" class="max-w-3xl space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-panel">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Entry Key</label>
+        <input name="entry_key" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" placeholder="NB-0002" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Status</label>
+        <select name="status" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none">
+          <option value="draft">Draft</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Title</label>
+      <input name="title" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Link To Project (Optional)</label>
+      <select name="project_id" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none">
+        <option value="">None</option>
+        {% for project in projects %}
+        <option value="{{ project.id }}" {% if selected_project_id and selected_project_id == project.id %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="rounded-lg bg-shell-900 px-4 py-2 text-sm font-medium text-white hover:bg-shell-800">Create Notebook Entry</button>
+  </form>
+</div>

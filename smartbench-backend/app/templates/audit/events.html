@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Audit Trail | SmartBench{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <h2 class="text-2xl font-semibold">Audit Trail</h2>
+  <section class="bg-white rounded-xl shadow overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50"><tr><th class="text-left p-3">Timestamp</th><th class="text-left p-3">Action</th><th class="text-left p-3">Target</th></tr></thead>
+      <tbody>
+      {% for event in events %}
+        <tr class="border-t">
+          <td class="p-3">{{ event.created_at }}</td>
+          <td class="p-3">{{ event.action }}</td>
+          <td class="p-3">{{ event.target_type }}:{{ event.target_id }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

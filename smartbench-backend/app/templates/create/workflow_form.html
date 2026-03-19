@@ -1,0 +1,33 @@
+{% set title = 'Start Workflow Run' %}
+{% set subtitle = 'Workflow Definition: ' ~ workflow_definition.name %}
+{% set breadcrumbs = [
+  {'label': 'Create', 'url': url_for('dashboard.create_home')},
+  {'label': 'Workflow Run', 'url': None}
+] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <form method="post" class="max-w-3xl space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-panel">
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Run Key</label>
+      <input name="run_key" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" placeholder="RUN-0002" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Context JSON</label>
+      <textarea name="context_json" rows="5" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs focus:border-shell-700 focus:outline-none" placeholder='{"sample_id":"Sample-002"}'>{}</textarea>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Link To Project (Optional)</label>
+      <select name="project_id" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none">
+        <option value="">None</option>
+        {% for project in projects %}
+        <option value="{{ project.id }}" {% if selected_project_id and selected_project_id == project.id %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="rounded-lg bg-shell-900 px-4 py-2 text-sm font-medium text-white hover:bg-shell-800">Start Workflow Run</button>
+  </form>
+</div>

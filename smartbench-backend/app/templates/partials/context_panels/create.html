@@ -1,0 +1,66 @@
+<div class="p-4 space-y-5">
+  <section class="space-y-2">
+    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Projects</p>
+    <a href="{{ url_for('dashboard.create_project') }}" hx-get="{{ url_for('dashboard.create_project') }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="focus-visible-ring block rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:border-slate-300 hover:bg-slate-50">Create Project</a>
+  </section>
+
+  <section class="space-y-2">
+    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Registry</p>
+    <div class="space-y-1">
+      {% for entity_type in entity_types %}
+      {% set create_entity_url = url_for('dashboard.create_entity_from_type', entity_type_id=entity_type.id, project_id=selected_project_id) if selected_project_id else url_for('dashboard.create_entity_from_type', entity_type_id=entity_type.id) %}
+      <a href="{{ create_entity_url }}" hx-get="{{ create_entity_url }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="focus-visible-ring block rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+        <p class="font-medium">Create Entity</p>
+        <p class="text-xs text-slate-500">{{ entity_type.name }}</p>
+      </a>
+      {% else %}
+      <p class="text-xs text-slate-400">No entity types available.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="space-y-2">
+    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Notebooks</p>
+    <div class="space-y-1">
+      {% for template in notebook_templates %}
+      {% set create_notebook_url = url_for('dashboard.create_notebook_from_template', template_id=template.id, project_id=selected_project_id) if selected_project_id else url_for('dashboard.create_notebook_from_template', template_id=template.id) %}
+      <a href="{{ create_notebook_url }}" hx-get="{{ create_notebook_url }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="focus-visible-ring block rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+        <p class="font-medium">Create Notebook Entry</p>
+        <p class="text-xs text-slate-500">{{ template.name }}</p>
+      </a>
+      {% else %}
+      <p class="text-xs text-slate-400">No notebook templates available.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="space-y-2">
+    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Results</p>
+    <div class="space-y-1">
+      {% for schema in result_schemas %}
+      {% set create_result_url = url_for('dashboard.create_result_from_schema', schema_id=schema.id, project_id=selected_project_id) if selected_project_id else url_for('dashboard.create_result_from_schema', schema_id=schema.id) %}
+      <a href="{{ create_result_url }}" hx-get="{{ create_result_url }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="focus-visible-ring block rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+        <p class="font-medium">Create Result Record</p>
+        <p class="text-xs text-slate-500">{{ schema.name }}</p>
+      </a>
+      {% else %}
+      <p class="text-xs text-slate-400">No result schemas available.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="space-y-2">
+    <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Workflows</p>
+    <div class="space-y-1">
+      {% for definition in workflow_definitions %}
+      {% set create_workflow_url = url_for('dashboard.create_workflow_run', workflow_id=definition.id, project_id=selected_project_id) if selected_project_id else url_for('dashboard.create_workflow_run', workflow_id=definition.id) %}
+      <a href="{{ create_workflow_url }}" hx-get="{{ create_workflow_url }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="focus-visible-ring block rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+        <p class="font-medium">Start Workflow Run</p>
+        <p class="text-xs text-slate-500">{{ definition.name }}</p>
+      </a>
+      {% else %}
+      <p class="text-xs text-slate-400">No workflow definitions available.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>

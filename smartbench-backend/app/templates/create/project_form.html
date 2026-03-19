@@ -1,0 +1,21 @@
+{% set title = 'Create Project' %}
+{% set subtitle = 'Projects are the primary organizational root for notebooks, entities, results, and workflows.' %}
+{% set breadcrumbs = [
+  {'label': 'Create', 'url': url_for('dashboard.create_home')},
+  {'label': 'Project', 'url': None}
+] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <form method="post" class="max-w-2xl space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-panel">
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Project Name</label>
+      <input name="name" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Description</label>
+      <textarea name="description" rows="4" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none"></textarea>
+    </div>
+    <button type="submit" class="rounded-lg bg-shell-900 px-4 py-2 text-sm font-medium text-white hover:bg-shell-800">Create Project</button>
+  </form>
+</div>

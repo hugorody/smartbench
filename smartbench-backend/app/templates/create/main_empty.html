@@ -1,0 +1,12 @@
+{% set title = 'Create Launcher' %}
+{% set subtitle = 'Choose an object type from the context panel to start a schema-driven create flow.' %}
+{% set breadcrumbs = [{'label': 'Create', 'url': None}] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  {% set title = 'Select What To Create' %}
+  {% set message = 'Use the grouped options in the context panel: Projects, Registry, Notebooks, Results, and Workflows.' %}
+  {% set action_label = None %}
+  {% set action_url = None %}
+  {% include 'partials/empty_state.html' %}
+</div>

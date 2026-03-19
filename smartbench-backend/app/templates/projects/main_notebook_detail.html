@@ -1,0 +1,19 @@
+{% set title = selected_notebook.title %}
+{% set subtitle = 'Notebook entry linked to this project.' %}
+{% set breadcrumbs = [
+  {'label': 'Projects', 'url': url_for('dashboard.projects_home')},
+  {'label': selected_project.name, 'url': url_for('dashboard.project_overview', project_id=selected_project.id)},
+  {'label': 'Notebook', 'url': None}
+] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-panel">
+    <dl class="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+      <div><dt class="text-slate-500">Entry Key</dt><dd class="font-medium text-slate-900">{{ selected_notebook.entry_key }}</dd></div>
+      <div><dt class="text-slate-500">Status</dt><dd class="font-medium text-slate-900">{{ selected_notebook.status }}</dd></div>
+      <div><dt class="text-slate-500">Created</dt><dd class="font-medium text-slate-900">{{ selected_notebook.created_at }}</dd></div>
+    </dl>
+    <p class="mt-6 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">Notebook section editing will be expanded in the next iteration. This view currently focuses on project navigation and record context.</p>
+  </section>
+</div>

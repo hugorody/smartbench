@@ -1,0 +1,42 @@
+<aside class="fixed inset-y-0 left-0 z-30 w-24 border-r border-slate-800/70 bg-gradient-to-b from-[#0b2340] via-[#0f2d53] to-[#112f57] flex flex-col">
+  <div class="h-16 flex items-center justify-center border-b border-slate-800/60">
+    <a href="{{ url_for('dashboard.projects_home') }}" class="focus-visible-ring text-slate-100 text-xs tracking-[0.22em] font-semibold uppercase">SB</a>
+  </div>
+
+  <nav class="flex-1 px-2 py-4 space-y-1.5">
+    {% set nav_items = [
+      ('agents', 'Agents', 'dashboard.agents_home'),
+      ('projects', 'Projects', 'dashboard.projects_home'),
+      ('create', 'Create', 'dashboard.create_home')
+    ] %}
+    {% for key, label, endpoint in nav_items %}
+      {% set is_active = active_section == key %}
+      <a
+        href="{{ url_for(endpoint) }}"
+        class="focus-visible-ring group flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-3 text-[11px] font-medium transition {{ 'bg-slate-100 text-shell-900 shadow-sm' if is_active else 'text-slate-300 hover:bg-white/10 hover:text-white' }}"
+      >
+        {% if key == 'agents' %}
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10h8M8 14h5"/><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 18l-2 3h12l-2-3"/></svg>
+        {% elif key == 'projects' %}
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        {% else %}
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+        {% endif %}
+        <span>{{ label }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
+  <div class="px-2 pb-3 space-y-2 border-t border-slate-800/60 pt-3">
+    <select id="workspace-switcher" class="focus-visible-ring w-full rounded-lg border border-slate-700 bg-slate-800/80 px-2 py-1.5 text-[11px] text-slate-100 focus:border-slate-500 focus:outline-none">
+      {% for ws in all_workspaces %}
+      <option value="{{ ws.id }}" {% if active_workspace_id == ws.id|string %}selected{% endif %}>{{ ws.name }}</option>
+      {% endfor %}
+    </select>
+    {% if current_user.is_authenticated %}
+    <form action="{{ url_for('auth.logout') }}" method="post">
+      <button class="focus-visible-ring w-full rounded-lg border border-slate-700 px-2 py-1.5 text-[11px] text-slate-300 hover:bg-slate-800/70 hover:text-white">Logout</button>
+    </form>
+    {% endif %}
+  </div>
+</aside>

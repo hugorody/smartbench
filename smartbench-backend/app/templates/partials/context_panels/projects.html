@@ -1,0 +1,104 @@
+<div class="p-4 space-y-5">
+  <form method="get" action="{{ url_for('dashboard.projects_home') }}" class="space-y-2">
+    <label for="project-search" class="text-xs uppercase tracking-[0.12em] text-slate-500">Project Browser</label>
+    <input id="project-search" name="q" value="{{ project_query }}" placeholder="Search projects" class="focus-visible-ring w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" />
+  </form>
+
+  <div data-context-list class="space-y-1">
+    {% for project in projects %}
+      {% set active = selected_project and project.id == selected_project.id %}
+      <a
+        href="{{ url_for('dashboard.project_overview', project_id=project.id) }}"
+        hx-get="{{ url_for('dashboard.project_overview', project_id=project.id) }}"
+        hx-target="#main-panel"
+        hx-swap="innerHTML"
+        hx-push-url="true"
+        data-context-item
+        class="block rounded-lg border px-3 py-2 transition {{ 'border-shell-300 bg-shell-100' if active else 'border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300' }}"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-sm font-medium text-slate-900">{{ project.name }}</p>
+          <span class="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] text-slate-600">{{ project_counts.get(project.id, 0) }}</span>
+        </div>
+        {% if project.description %}
+        <p class="mt-1 line-clamp-2 text-xs text-slate-500">{{ project.description }}</p>
+        {% endif %}
+      </a>
+    {% else %}
+      <div class="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500">No projects available.</div>
+    {% endfor %}
+  </div>
+
+  {% if selected_project %}
+  <div class="space-y-4 border-t border-slate-200 pt-4">
+    <div>
+      <a
+        href="{{ url_for('dashboard.project_overview', project_id=selected_project.id) }}"
+        hx-get="{{ url_for('dashboard.project_overview', project_id=selected_project.id) }}"
+        hx-target="#main-panel"
+        hx-swap="innerHTML"
+        hx-push-url="true"
+        class="text-sm font-semibold text-slate-900 hover:text-shell-800"
+      >Overview</a>
+    </div>
+
+    <div class="space-y-3">
+      <section>
+        <div class="mb-1 flex items-center justify-between">
+          <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Notebooks</p>
+          <span class="text-xs text-slate-500">{{ selected_resources.counts.notebook_entries }}</span>
+        </div>
+        <div class="space-y-1">
+          {% for item in selected_resources.notebook_entries[:5] %}
+          <a href="{{ url_for('dashboard.project_notebook_detail', project_id=selected_project.id, notebook_id=item.id) }}" hx-get="{{ url_for('dashboard.project_notebook_detail', project_id=selected_project.id, notebook_id=item.id) }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100">{{ item.title }}</a>
+          {% else %}
+          <p class="px-2 py-1 text-xs text-slate-400">No notebook entries</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-1 flex items-center justify-between">
+          <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Entities</p>
+          <span class="text-xs text-slate-500">{{ selected_resources.counts.entities }}</span>
+        </div>
+        <div class="space-y-1">
+          {% for item in selected_resources.entities[:5] %}
+          <a href="{{ url_for('dashboard.project_entity_detail', project_id=selected_project.id, entity_id=item.id) }}" hx-get="{{ url_for('dashboard.project_entity_detail', project_id=selected_project.id, entity_id=item.id) }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100">{{ item.name }}</a>
+          {% else %}
+          <p class="px-2 py-1 text-xs text-slate-400">No entities</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-1 flex items-center justify-between">
+          <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Results</p>
+          <span class="text-xs text-slate-500">{{ selected_resources.counts.result_records }}</span>
+        </div>
+        <div class="space-y-1">
+          {% for item in selected_resources.result_records[:5] %}
+          <a href="{{ url_for('dashboard.project_result_detail', project_id=selected_project.id, result_id=item.id) }}" hx-get="{{ url_for('dashboard.project_result_detail', project_id=selected_project.id, result_id=item.id) }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100">{{ item.record_key }}</a>
+          {% else %}
+          <p class="px-2 py-1 text-xs text-slate-400">No result records</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-1 flex items-center justify-between">
+          <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Workflows</p>
+          <span class="text-xs text-slate-500">{{ selected_resources.counts.workflow_runs }}</span>
+        </div>
+        <div class="space-y-1">
+          {% for item in selected_resources.workflow_runs[:5] %}
+          <a href="{{ url_for('dashboard.project_workflow_detail', project_id=selected_project.id, run_id=item.id) }}" hx-get="{{ url_for('dashboard.project_workflow_detail', project_id=selected_project.id, run_id=item.id) }}" hx-target="#main-panel" hx-swap="innerHTML" hx-push-url="true" class="block rounded-md px-2 py-1.5 text-sm text-slate-700 hover:bg-slate-100">{{ item.run_key }}</a>
+          {% else %}
+          <p class="px-2 py-1 text-xs text-slate-400">No workflow runs</p>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </div>
+  {% endif %}
+</div>

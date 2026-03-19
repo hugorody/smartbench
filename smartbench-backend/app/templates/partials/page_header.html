@@ -1,0 +1,29 @@
+<header class="border-b border-slate-200 bg-white px-8 py-5">
+  {% if breadcrumbs %}
+  <nav class="mb-2 text-xs text-slate-500">
+    {% for crumb in breadcrumbs %}
+      {% if crumb.url %}
+      <a href="{{ crumb.url }}" class="hover:text-slate-800">{{ crumb.label }}</a>
+      {% else %}
+      <span class="text-slate-700">{{ crumb.label }}</span>
+      {% endif %}
+      {% if not loop.last %}<span class="mx-1 text-slate-400">/</span>{% endif %}
+    {% endfor %}
+  </nav>
+  {% endif %}
+  <div class="flex items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-semibold text-slate-900">{{ title }}</h1>
+      {% if subtitle %}
+      <p class="mt-1 text-sm text-slate-500">{{ subtitle }}</p>
+      {% endif %}
+    </div>
+    {% if actions %}
+    <div class="flex items-center gap-2">
+      {% for action in actions %}
+      <a href="{{ action.url }}" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100">{{ action.label }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</header>

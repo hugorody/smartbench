@@ -1,0 +1,62 @@
+{% set title = 'Create Entity' %}
+{% set subtitle = 'Entity Type: ' ~ entity_type.name %}
+{% set breadcrumbs = [
+  {'label': 'Create', 'url': url_for('dashboard.create_home')},
+  {'label': 'Entity', 'url': None}
+] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <form method="post" class="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-panel">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">External ID</label>
+        <input name="external_id" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" placeholder="PLASMID-002" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Display Name</label>
+        <input name="name" required class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Link To Project (Optional)</label>
+      <select name="project_id" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none">
+        <option value="">None</option>
+        {% for project in projects %}
+        <option value="{{ project.id }}" {% if selected_project_id and selected_project_id == project.id %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {% for field in entity_fields %}
+      <div class="rounded-lg border border-slate-200 bg-slate-50 p-4 lg:col-span-{{ 2 if field.field_type == 'json' or field.is_array else 1 }}">
+        <label class="block text-sm font-medium text-slate-700">{{ field.label }}{% if field.is_required %} *{% endif %}</label>
+        {% if field.field_type == 'enum' %}
+          <select name="{{ field.name }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" {% if field.is_required %}required{% endif %}>
+            <option value="">Select...</option>
+            {% for value in field.enum_values or [] %}
+            <option value="{{ value }}">{{ value }}</option>
+            {% endfor %}
+          </select>
+        {% elif field.field_type == 'boolean' %}
+          <select name="{{ field.name }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" {% if field.is_required %}required{% endif %}>
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        {% elif field.field_type == 'json' or field.is_array %}
+          <textarea name="{{ field.name }}" rows="4" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-xs focus:border-shell-700 focus:outline-none" {% if field.is_required %}required{% endif %} placeholder="{{ '[]' if field.is_array else '{}' }}"></textarea>
+        {% else %}
+          <input name="{{ field.name }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" {% if field.is_required %}required{% endif %} />
+        {% endif %}
+        <p class="mt-1 text-xs text-slate-500">{{ field.field_type }}{% if field.is_array %} array{% endif %}</p>
+      </div>
+      {% else %}
+      <p class="text-sm text-slate-500">This entity type has no dynamic fields yet.</p>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="rounded-lg bg-shell-900 px-4 py-2 text-sm font-medium text-white hover:bg-shell-800">Create Entity</button>
+  </form>
+</div>

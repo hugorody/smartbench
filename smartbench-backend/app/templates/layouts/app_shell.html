@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}SmartBench{% endblock %}
+{% block body %}
+<div class="relative h-screen app-ambient app-grid">
+  <div id="htmx-progress" class="ht-progress pointer-events-none fixed left-0 top-0 z-[70] h-1 w-full bg-cyan-500"></div>
+
+  {% include "partials/sidebar.html" %}
+
+  <div class="h-full pl-24 flex">
+    {% if active_section == 'agents' %}
+      {% set panel_title = 'Agents' %}
+    {% elif active_section == 'create' %}
+      {% set panel_title = 'Create' %}
+    {% else %}
+      {% set panel_title = 'Projects' %}
+    {% endif %}
+
+    <div id="context-panel-wrapper" class="hidden lg:flex transition-all duration-300">
+      {% include "partials/context_panel.html" %}
+    </div>
+
+    <main class="relative min-w-0 flex-1 flex flex-col bg-shell-100/90 backdrop-blur-sm">
+      <div class="absolute right-4 top-4 z-40 flex items-center gap-2">
+        <button
+          id="context-panel-show-btn"
+          type="button"
+          style="display: none"
+          class="focus-visible-ring rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-100"
+        >
+          Show panel
+        </button>
+        <button
+          id="quick-actions-open-btn"
+          type="button"
+          class="focus-visible-ring rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-100"
+          aria-haspopup="dialog"
+          aria-controls="quick-actions-modal"
+          aria-expanded="false"
+        >
+          Quick actions
+          <span class="ml-1 font-mono text-[10px] text-slate-500">⌘K</span>
+        </button>
+      </div>
+
+      {% with alerts = get_flashed_messages(with_categories=true) %}
+        {% if alerts %}
+        <div class="space-y-2 border-b border-slate-200 bg-white/90 px-6 py-3 backdrop-blur-sm">
+          {% for category, message in alerts %}
+          <div class="rounded-lg border px-3 py-2 text-sm {{ 'border-emerald-200 bg-emerald-50 text-emerald-900' if category == 'success' else 'border-rose-200 bg-rose-50 text-rose-900' }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+
+      <section id="main-panel" class="smart-scroll panel-animate-in min-h-0 flex-1 overflow-y-auto">
+        {% include main_template %}
+      </section>
+    </main>
+  </div>
+</div>
+
+<div
+  id="quick-actions-modal"
+  class="fixed inset-0 z-[80] hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="quick-actions-title"
+>
+  <button id="quick-actions-backdrop" type="button" class="absolute inset-0 bg-slate-950/40 backdrop-blur-[2px]"></button>
+  <div class="relative mx-auto mt-20 w-full max-w-2xl px-4">
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+      <div class="border-b border-slate-200 px-4 py-3">
+        <p id="quick-actions-title" class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Quick Actions</p>
+        <input
+          id="quick-actions-input"
+          type="text"
+          placeholder="Search actions..."
+          class="focus-visible-ring mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400"
+          autocomplete="off"
+        />
+      </div>
+      <div id="quick-actions-list" class="smart-scroll max-h-[60vh] overflow-y-auto p-2">
+        <a data-command-item href="{{ url_for('dashboard.agents_home') }}" class="command-item block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-100">
+          <span class="font-medium">Open Agents</span>
+          <span class="block text-xs text-slate-500">Go to scientific copilot sessions</span>
+        </a>
+        <a data-command-item href="{{ url_for('dashboard.new_agent_session') }}" class="command-item block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-100">
+          <span class="font-medium">New Agent Conversation</span>
+          <span class="block text-xs text-slate-500">Start a fresh assistant thread</span>
+        </a>
+        <a data-command-item href="{{ url_for('dashboard.projects_home') }}" class="command-item block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-100">
+          <span class="font-medium">Open Projects</span>
+          <span class="block text-xs text-slate-500">Browse projects and linked resources</span>
+        </a>
+        <a data-command-item href="{{ url_for('dashboard.create_home') }}" class="command-item block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-100">
+          <span class="font-medium">Open Create Launcher</span>
+          <span class="block text-xs text-slate-500">Create project/entity/notebook/result/workflow</span>
+        </a>
+        <a data-command-item href="{{ url_for('dashboard.create_project') }}" class="command-item block rounded-lg px-3 py-2 text-sm text-slate-800 hover:bg-slate-100">
+          <span class="font-medium">Create Project</span>
+          <span class="block text-xs text-slate-500">Open project creation form</span>
+        </a>
+      </div>
+      <div class="border-t border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500">
+        Enter to open. Esc to close. Ctrl/Cmd+B toggles context panel.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

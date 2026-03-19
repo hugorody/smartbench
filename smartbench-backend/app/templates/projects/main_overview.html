@@ -1,0 +1,75 @@
+{% set title = selected_project.name %}
+{% set subtitle = selected_project.description or 'Project overview and linked scientific resources.' %}
+{% set breadcrumbs = [
+  {'label': 'Projects', 'url': url_for('dashboard.projects_home')},
+  {'label': selected_project.name, 'url': None}
+] %}
+{% set actions = [{'label': 'Open Create Launcher', 'url': url_for('dashboard.create_home', project_id=selected_project.id)}] %}
+{% include 'partials/page_header.html' %}
+
+<div class="space-y-6 p-8">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-panel">
+      <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Entities</p>
+      <p class="mt-2 text-2xl font-semibold text-slate-900">{{ selected_resources.counts.entities }}</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-panel">
+      <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Notebooks</p>
+      <p class="mt-2 text-2xl font-semibold text-slate-900">{{ selected_resources.counts.notebook_entries }}</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-panel">
+      <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Results</p>
+      <p class="mt-2 text-2xl font-semibold text-slate-900">{{ selected_resources.counts.result_records }}</p>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-panel">
+      <p class="text-xs uppercase tracking-[0.12em] text-slate-500">Workflow Runs</p>
+      <p class="mt-2 text-2xl font-semibold text-slate-900">{{ selected_resources.counts.workflow_runs }}</p>
+    </article>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
+    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-panel">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Entities</h3>
+      <div class="mt-3 space-y-2">
+        {% for item in selected_resources.entities[:6] %}
+        <a class="block rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ url_for('dashboard.project_entity_detail', project_id=selected_project.id, entity_id=item.id) }}">{{ item.name }} <span class="text-slate-400">({{ item.external_id }})</span></a>
+        {% else %}
+        <p class="text-sm text-slate-500">No entities linked to this project.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-panel">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Notebook Entries</h3>
+      <div class="mt-3 space-y-2">
+        {% for item in selected_resources.notebook_entries[:6] %}
+        <a class="block rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ url_for('dashboard.project_notebook_detail', project_id=selected_project.id, notebook_id=item.id) }}">{{ item.title }} <span class="text-slate-400">({{ item.entry_key }})</span></a>
+        {% else %}
+        <p class="text-sm text-slate-500">No notebook entries linked to this project.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-panel">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Result Records</h3>
+      <div class="mt-3 space-y-2">
+        {% for item in selected_resources.result_records[:6] %}
+        <a class="block rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ url_for('dashboard.project_result_detail', project_id=selected_project.id, result_id=item.id) }}">{{ item.record_key }}</a>
+        {% else %}
+        <p class="text-sm text-slate-500">No result records linked to this project.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-panel">
+      <h3 class="text-sm font-semibold text-slate-900">Recent Workflow Runs</h3>
+      <div class="mt-3 space-y-2">
+        {% for item in selected_resources.workflow_runs[:6] %}
+        <a class="block rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ url_for('dashboard.project_workflow_detail', project_id=selected_project.id, run_id=item.id) }}">{{ item.run_key }} <span class="text-slate-400">{{ item.current_state }}</span></a>
+        {% else %}
+        <p class="text-sm text-slate-500">No workflow runs linked to this project.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>

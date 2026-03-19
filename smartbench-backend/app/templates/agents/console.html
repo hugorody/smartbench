@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Scientific Copilot | SmartBench{% endblock %}
+{% block content %}
+<div class="space-y-6">
+  <h2 class="text-2xl font-semibold">Scientific Copilot</h2>
+  <div class="bg-amber-100 border border-amber-300 text-amber-900 rounded p-3 text-sm">
+    Critical actions will require explicit confirmation in future versions.
+  </div>
+
+  <section class="bg-white rounded-xl shadow p-4 space-y-3">
+    <textarea id="agent-prompt" class="w-full border rounded p-2" rows="4" placeholder="Ask about entities, schemas, or workflows..."></textarea>
+    <button id="agent-submit" class="bg-slate-900 text-white rounded px-4 py-2">Send Prompt</button>
+  </section>
+
+  <section class="bg-white rounded-xl shadow p-4 space-y-3">
+    <h3 class="font-semibold">Assistant Response</h3>
+    <pre id="agent-response" class="bg-slate-100 rounded p-3 text-sm whitespace-pre-wrap"></pre>
+    <h4 class="font-semibold">Tool Actions</h4>
+    <pre id="agent-actions" class="bg-slate-100 rounded p-3 text-xs whitespace-pre-wrap"></pre>
+  </section>
+
+  <section class="bg-white rounded-xl shadow p-4">
+    <h3 class="font-semibold mb-2">Schema Context Snapshot</h3>
+    <pre class="bg-slate-100 rounded p-3 text-xs whitespace-pre-wrap">{{ schema_context }}</pre>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+window.SmartBenchAgents.bindConsole("{{ workspace.id }}");
+</script>
+{% endblock %}

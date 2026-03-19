@@ -1,0 +1,20 @@
+{% set title = selected_workflow_run.run_key %}
+{% set subtitle = 'Workflow run linked to this project.' %}
+{% set breadcrumbs = [
+  {'label': 'Projects', 'url': url_for('dashboard.projects_home')},
+  {'label': selected_project.name, 'url': url_for('dashboard.project_overview', project_id=selected_project.id)},
+  {'label': 'Workflow Run', 'url': None}
+] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-panel">
+    <dl class="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+      <div><dt class="text-slate-500">Run Key</dt><dd class="font-medium text-slate-900">{{ selected_workflow_run.run_key }}</dd></div>
+      <div><dt class="text-slate-500">Current State</dt><dd class="font-medium text-slate-900">{{ selected_workflow_run.current_state }}</dd></div>
+      <div><dt class="text-slate-500">Created</dt><dd class="font-medium text-slate-900">{{ selected_workflow_run.created_at }}</dd></div>
+    </dl>
+    <h3 class="mt-6 text-sm font-semibold text-slate-900">Context Data</h3>
+    <pre class="mt-3 smart-scroll overflow-auto rounded-lg bg-slate-900 p-4 text-xs text-slate-100">{{ (selected_workflow_run.context_data or {}) | tojson(indent=2) }}</pre>
+  </section>
+</div>

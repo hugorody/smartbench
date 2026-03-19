@@ -1,0 +1,12 @@
+{% set title = 'Projects Workspace' %}
+{% set subtitle = 'Select a project in the browser panel to open its scientific assets.' %}
+{% set breadcrumbs = [{'label': 'Projects', 'url': None}] %}
+{% include 'partials/page_header.html' %}
+
+<div class="p-8">
+  {% set title = 'No Project Selected' %}
+  {% set message = 'Use the context panel to select a project. The selected project will expose notebooks, entities, results, and workflows.' %}
+  {% set action_label = 'Create New Project' %}
+  {% set action_url = url_for('dashboard.create_project') %}
+  {% include 'partials/empty_state.html' %}
+</div>

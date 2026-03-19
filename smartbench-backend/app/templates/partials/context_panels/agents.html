@@ -1,0 +1,56 @@
+<div class="p-4 space-y-4">
+  <a href="{{ url_for('dashboard.new_agent_session') }}" class="focus-visible-ring inline-flex w-full items-center justify-center rounded-lg bg-shell-900 px-3 py-2 text-sm font-medium text-white hover:bg-shell-800">
+    New Conversation
+  </a>
+
+  <div>
+    <label for="agent-context-filter" class="text-xs uppercase tracking-[0.12em] text-slate-500">Search Threads</label>
+    <input id="agent-context-filter" data-filter-input="agents-list" type="text" placeholder="Filter sessions" class="focus-visible-ring mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-shell-700 focus:outline-none" />
+  </div>
+
+  <div id="agents-list" data-context-list class="space-y-1">
+    {% if agent_sessions %}
+      {% for item in agent_sessions %}
+      {% set active = active_agent_session and item.id == active_agent_session.id %}
+      <div class="filter-item rounded-lg border px-2 py-2 transition {{ 'border-shell-300 bg-shell-50' if active else 'border-slate-200 bg-white' }}">
+        <a
+          href="{{ url_for('dashboard.agent_session_detail', session_id=item.id) }}"
+          hx-get="{{ url_for('dashboard.agent_session_detail', session_id=item.id) }}"
+          hx-target="#main-panel"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          data-context-item
+          class="block rounded-md border px-3 py-2 transition {{ 'border-shell-300 bg-shell-100' if active else 'border-transparent hover:bg-slate-50' }}"
+        >
+          <p class="text-sm font-medium text-slate-900">{{ item.session_label or 'Scientific Copilot Session' }}</p>
+          <p class="mt-1 text-xs text-slate-500">{{ item.updated_at.strftime('%Y-%m-%d %H:%M') if item.updated_at else '' }}</p>
+        </a>
+
+        <details class="mt-2 px-1 text-xs text-slate-600">
+          <summary class="cursor-pointer select-none hover:text-slate-900">Actions</summary>
+          <div class="mt-2 space-y-2">
+            <form method="post" action="{{ url_for('dashboard.rename_agent_session', session_id=item.id) }}" class="flex items-center gap-2">
+              <input
+                name="session_label"
+                value="{{ item.session_label or 'Scientific Copilot Session' }}"
+                class="focus-visible-ring min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-xs focus:border-shell-700 focus:outline-none"
+                maxlength="255"
+                required
+              />
+              <button class="focus-visible-ring rounded border border-slate-300 px-2 py-1 text-xs hover:bg-slate-100">Rename</button>
+            </form>
+
+            <form method="post" action="{{ url_for('dashboard.delete_agent_session', session_id=item.id) }}" data-agent-delete-form data-session-id="{{ item.id }}">
+              <button class="focus-visible-ring w-full rounded border border-rose-300 px-2 py-1 text-xs text-rose-700 hover:bg-rose-50">Delete Conversation</button>
+            </form>
+          </div>
+        </details>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500">No conversations yet.</div>
+    {% endif %}
+  </div>
+
+  <p class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">Tip: use <span class="font-mono">Ctrl/Cmd+K</span> for quick actions.</p>
+</div>

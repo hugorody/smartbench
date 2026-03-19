@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" class="h-full bg-slate-100">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}SmartBench{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            shell: {
+              50: "#f7f9fc",
+              100: "#eef2f9",
+              200: "#dbe4f1",
+              700: "#334155",
+              800: "#1f293b",
+              900: "#0b2340",
+            },
+          },
+          boxShadow: {
+            panel: "0 8px 28px rgba(15, 23, 42, 0.05)",
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    :root {
+      --shell-ring: rgba(11, 35, 64, 0.22);
+      --shell-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html, body {
+      font-family: "IBM Plex Sans", sans-serif;
+    }
+
+    .font-mono {
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    .app-ambient {
+      background:
+        radial-gradient(900px 420px at 85% -8%, rgba(59, 130, 246, 0.12), transparent 65%),
+        radial-gradient(700px 300px at 2% 102%, rgba(14, 165, 233, 0.11), transparent 60%),
+        linear-gradient(180deg, #f7f9fc 0%, #eef3fb 100%);
+    }
+
+    .app-grid {
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+      background-position: -1px -1px;
+    }
+
+    .smart-scroll::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .smart-scroll::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.35);
+      border-radius: 999px;
+    }
+
+    .focus-visible-ring:focus-visible {
+      outline: 2px solid var(--shell-ring);
+      outline-offset: 2px;
+    }
+
+    .panel-animate-in {
+      animation: panelFadeIn 220ms var(--shell-ease);
+    }
+
+    .ht-progress {
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 260ms var(--shell-ease), opacity 180ms ease;
+      opacity: 0;
+    }
+
+    .ht-progress.is-loading {
+      transform: scaleX(0.92);
+      opacity: 1;
+    }
+
+    @keyframes panelFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  {% block head %}{% endblock %}
+</head>
+<body class="h-full text-slate-900 antialiased">
+  {% block body %}{% endblock %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

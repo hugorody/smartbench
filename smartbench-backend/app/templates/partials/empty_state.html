@@ -1,0 +1,7 @@
+<div class="mx-auto mt-16 max-w-xl rounded-2xl border border-dashed border-slate-300 bg-white px-8 py-10 text-center shadow-panel">
+  <h3 class="text-lg font-semibold text-slate-900">{{ title }}</h3>
+  <p class="mt-2 text-sm text-slate-500">{{ message }}</p>
+  {% if action_label and action_url %}
+  <a href="{{ action_url }}" class="mt-5 inline-flex rounded-lg bg-shell-900 px-4 py-2 text-sm font-medium text-white hover:bg-shell-800">{{ action_label }}</a>
+  {% endif %}
+</div>
