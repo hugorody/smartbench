@@ -5,10 +5,10 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.models import Entity, EntityType, EntityTypeField, EntityTypeVersion
+from app.models import Entity, EntityType, EntityTypeField, EntityTypeVersion, Project, ProjectResourceLink
 from app.schemas.registry import EntityCreate, EntityTypeCreate, EntityTypeVersionCreate, EntityUpdate
 from app.services.audit_service import AuditService
 from app.services.exceptions import NotFoundError, ValidationError
@@ -297,3 +297,62 @@ class RegistryService:
             .limit(50)
         )
         return list(session.scalars(stmt).all())
+
+    @staticmethod
+    def count_entities_by_type(
+        session: Session,
+        workspace_id: uuid.UUID,
+        *,
+        entity_type_id: uuid.UUID | None = None,
+        entity_type_slug: str | None = None,
+        project_id: uuid.UUID | None = None,
+    ) -> tuple[EntityType | None, int, Project | None]:
+        stmt = select(EntityType).where(EntityType.workspace_id == workspace_id)
+        entity_type: EntityType | None = None
+        project: Project | None = None
+
+        if entity_type_id is not None:
+            stmt = stmt.where(EntityType.id == entity_type_id)
+            entity_type = session.scalar(stmt.limit(1))
+        elif entity_type_slug:
+            stmt = stmt.where(EntityType.slug == entity_type_slug)
+            entity_type = session.scalar(stmt.limit(1))
+
+        if (entity_type_id is not None or entity_type_slug is not None) and entity_type is None:
+            raise NotFoundError("Entity type not found in workspace")
+
+        count_stmt = select(func.count(Entity.id)).where(Entity.workspace_id == workspace_id)
+        if entity_type is not None:
+            count_stmt = count_stmt.where(Entity.entity_type_id == entity_type.id)
+
+        if project_id is not None:
+            project = session.scalar(
+                select(Project).where(Project.id == project_id).where(Project.workspace_id == workspace_id).limit(1)
+            )
+            if project is None:
+                raise NotFoundError("Project not found in workspace")
+
+            linked_entity_ids = [
+                parsed_id
+                for raw_id in session.scalars(
+                    select(ProjectResourceLink.resource_id)
+                    .where(ProjectResourceLink.workspace_id == workspace_id)
+                    .where(ProjectResourceLink.project_id == project.id)
+                    .where(ProjectResourceLink.resource_type == "entity")
+                ).all()
+                for parsed_id in [RegistryService._safe_uuid(raw_id)]
+                if parsed_id is not None
+            ]
+            if not linked_entity_ids:
+                return entity_type, 0, project
+            count_stmt = count_stmt.where(Entity.id.in_(linked_entity_ids))
+
+        total = session.scalar(count_stmt)
+        return entity_type, int(total or 0), project
+
+    @staticmethod
+    def _safe_uuid(raw_id: str) -> uuid.UUID | None:
+        try:
+            return uuid.UUID(raw_id)
+        except ValueError:
+            return None

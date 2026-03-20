@@ -9,6 +9,7 @@ from app.blueprints.agents import bp
 from app.extensions import db
 from app.schemas.agents import AgentPromptRequest
 from app.services.agent_service import AgentService
+from app.services.exceptions import ValidationError as ServiceValidationError
 from app.utils.request_context import get_identity
 
 
@@ -19,12 +20,16 @@ def prompt_agent() -> object:
     except PydanticValidationError as exc:
         return jsonify({"error": "validation_error", "details": exc.errors()}), 400
 
-    service = AgentService()
-    result = service.run_prompt(
-        db.session,
-        workspace_id=payload.workspace_id,
-        prompt=payload.prompt,
-        session_id=payload.session_id,
-        identity=get_identity(),
-    )
+    try:
+        service = AgentService()
+        result = service.run_prompt(
+            db.session,
+            workspace_id=payload.workspace_id,
+            prompt=payload.prompt,
+            session_id=payload.session_id,
+            identity=get_identity(),
+        )
+    except ServiceValidationError as exc:
+        return jsonify({"error": "validation_error", "message": str(exc)}), 400
+
     return jsonify(result.response.model_dump())

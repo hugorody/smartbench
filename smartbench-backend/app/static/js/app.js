@@ -280,7 +280,72 @@
     writeConversationHistory(sessionId, history);
   }
 
-  function appendAgentMessage(role, content, actions, options = {}) {
+  function renderArtifactsHtml(artifacts) {
+    if (!Array.isArray(artifacts) || artifacts.length === 0) return "";
+
+    return artifacts
+      .map((artifact) => {
+        const type = artifact?.type || "";
+        if (type === "table") {
+          const title = artifact.title ? `<div class=\"border-b border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700\">${escapeHtml(String(artifact.title))}</div>` : "";
+          const columns = Array.isArray(artifact.columns) ? artifact.columns : [];
+          const rows = Array.isArray(artifact.rows) ? artifact.rows : [];
+          const header = columns
+            .map((column) => `<th class=\"px-3 py-2 text-left font-medium text-slate-600\">${escapeHtml(String(column))}</th>`)
+            .join("");
+          const body = rows
+            .map((row) => {
+              const cells = Array.isArray(row) ? row : [];
+              const html = cells
+                .map((value) => `<td class=\"px-3 py-2 text-slate-700\">${escapeHtml(String(value ?? ""))}</td>`)
+                .join("");
+              return `<tr>${html}</tr>`;
+            })
+            .join("");
+          return `
+            <div class=\"overflow-hidden rounded-lg border border-slate-200\">
+              ${title}
+              <div class=\"overflow-x-auto\">
+                <table class=\"min-w-full divide-y divide-slate-200 text-xs\">
+                  <thead class=\"bg-slate-50\"><tr>${header}</tr></thead>
+                  <tbody class=\"divide-y divide-slate-100 bg-white\">${body}</tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        }
+
+        if (type === "bar_chart") {
+          const title = artifact.title ? `<p class=\"mb-2 text-xs font-medium text-slate-700\">${escapeHtml(String(artifact.title))}</p>` : "";
+          const labels = Array.isArray(artifact.labels) ? artifact.labels : [];
+          const values = Array.isArray(artifact.values) ? artifact.values.map((value) => Number(value) || 0) : [];
+          const max = values.length > 0 ? Math.max(...values, 1) : 1;
+          const bars = labels
+            .map((label, index) => {
+              const value = values[index] ?? 0;
+              const width = Math.max(0, Math.min(100, (value / max) * 100));
+              return `
+                <div>
+                  <div class=\"mb-1 flex items-center justify-between text-[11px] text-slate-600\">
+                    <span>${escapeHtml(String(label))}</span>
+                    <span>${escapeHtml(String(value))}</span>
+                  </div>
+                  <div class=\"h-2 rounded-full bg-slate-200\">
+                    <div class=\"h-2 rounded-full bg-shell-900\" style=\"width: ${width}%\"></div>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+          return `<div class=\"rounded-lg border border-slate-200 bg-slate-50 px-3 py-3\">${title}<div class=\"space-y-2\">${bars}</div></div>`;
+        }
+
+        return "";
+      })
+      .join("");
+  }
+
+  function appendAgentMessage(role, content, _actions, options = {}) {
     const { persist = false, sessionId = null } = options;
     const messageList = document.getElementById("agent-message-list");
     if (!messageList) return;
@@ -288,25 +353,15 @@
     const isUser = role === "user";
     const wrapper = document.createElement("article");
     wrapper.className = `flex ${isUser ? "justify-end" : "justify-start"}`;
-
-    let actionsHtml = "";
-    if (!isUser && Array.isArray(actions) && actions.length > 0) {
-      const rows = actions
-        .map((action) => {
-          const name = escapeHtml(action.tool_name || "tool");
-          const status = escapeHtml(action.status || "unknown");
-          return `<li class=\"rounded border border-slate-200 bg-white p-2\"><p class=\"font-mono text-[11px] text-slate-800\">${name}</p><p class=\"mt-1 text-[11px] text-slate-600\">status: ${status}</p></li>`;
-        })
-        .join("");
-      actionsHtml = `<div class=\"mt-3 rounded-lg bg-slate-50 p-3 text-xs text-slate-700\"><p class=\"font-semibold text-slate-800\">Tool Actions</p><ul class=\"mt-2 space-y-2\">${rows}</ul></div>`;
-    }
+    const artifacts = Array.isArray(options.artifacts) ? options.artifacts : [];
+    const artifactsHtml = !isUser ? renderArtifactsHtml(artifacts) : "";
 
     wrapper.innerHTML = `
       <div class=\"max-w-3xl rounded-2xl px-4 py-3 shadow-panel ${
         isUser ? "bg-shell-900 text-white" : "border border-slate-200 bg-white text-slate-900"
       }\">
         <p class=\"whitespace-pre-wrap text-sm leading-relaxed\">${escapeHtml(content)}</p>
-        ${actionsHtml}
+        ${artifactsHtml ? `<div class="mt-3 space-y-3">${artifactsHtml}</div>` : ""}
       </div>
     `;
 
@@ -314,7 +369,7 @@
     wrapper.scrollIntoView({ behavior: "smooth", block: "end" });
 
     if (persist && sessionId) {
-      appendConversationEntry(sessionId, { role, content, actions: actions || [] });
+      appendConversationEntry(sessionId, { role, content, actions: [], artifacts });
     }
   }
 
@@ -334,6 +389,7 @@
       appendAgentMessage(entry.role || "assistant", entry.content || "", entry.actions || [], {
         persist: false,
         sessionId,
+        artifacts: entry.artifacts || [],
       });
     });
   }
@@ -400,11 +456,13 @@
         appendAgentMessage("assistant", payload.response_text || "", payload.actions || [], {
           persist: true,
           sessionId,
+          artifacts: payload.artifacts || [],
         });
       } catch (error) {
         appendAgentMessage("assistant", `Error: ${String(error)}`, [], {
           persist: true,
           sessionId,
+          artifacts: [],
         });
       } finally {
         submitButton.disabled = false;

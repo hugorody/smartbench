@@ -25,4 +25,5 @@ class AgentPromptResponse(BaseModel):
     session_id: uuid.UUID
     response_text: str
     actions: list[AgentToolAction] = Field(default_factory=list)
+    artifacts: list[dict[str, Any]] = Field(default_factory=list)
     references: list[dict[str, Any]] = Field(default_factory=list)

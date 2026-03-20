@@ -353,7 +353,7 @@ def agent_session_detail(session_id: uuid.UUID) -> object:
                 {
                     "role": "assistant",
                     "content": output.get("response_text", ""),
-                    "actions": output.get("actions", []),
+                    "artifacts": output.get("artifacts", []),
                     "timestamp": log.created_at,
                 }
             )
